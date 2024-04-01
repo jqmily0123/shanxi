@@ -16,4 +16,6 @@ app.component("EnergyConsumption", EnergyConsumption);
 app.component("StatusData", StatusData);
 app.component("AlarmData", AlarmData);
 app.component("DeviceFault", DeviceFault);
+import Antd from "ant-design-vue";
+app.use(Antd);
 app.use(router).mount("#app");

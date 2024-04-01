@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <Header></Header>
     <div class="main">
       <div class="left">
         <div v-for="item in leftData" :key="item.id" class="item">
@@ -208,9 +207,6 @@ const rightData = data.slice(3, data.length);
 </script>
 <style scoped lang="less">
 .home {
-  width: 100%;
-  height: 100%;
-  background: url("@/assets/背景.png") no-repeat;
   background-size: 100% 100%;
   //display: flex;
   //flex-direction: column;
