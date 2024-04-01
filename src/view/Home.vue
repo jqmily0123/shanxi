@@ -200,7 +200,6 @@ const data = [
     component: "HomeCardBox",
   };
 });
-// console.log(data);
 
 const leftData = data.slice(0, 3);
 const rightData = data.slice(3, data.length);
@@ -227,7 +226,6 @@ const rightData = data.slice(3, data.length);
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid red;
     }
   }
 }
