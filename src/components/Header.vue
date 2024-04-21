@@ -8,10 +8,12 @@
 </script>
 <style scoped lang="less">
   .header{
+    width: 100%;
+    height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
+
     //background-color: #f0f0f0;
     position: relative;
     img, .title{

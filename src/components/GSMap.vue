@@ -11,6 +11,9 @@
 import * as echarts from "echarts";
 import GS from "@/assets/620000.json";
 import { onMounted, ref } from "vue";
+import { pinyin } from 'pinyin-pro';
+import {useRouter} from "vue-router";
+const router = useRouter();
 const GSMap = ref(null);
 const initMap = () => {
   const myChart = echarts.init(GSMap.value);
@@ -34,6 +37,11 @@ const initMap = () => {
     ],
   };
   myChart.setOption(option);
+  myChart.on("click", (params) => {
+    const { name } = params;
+    const param = pinyin(name,{toneType: 'none'}).split(" ").join("");
+    router.push({name:"Detail",params: { param:param}});
+  });
 };
 onMounted(() => {
   initMap();

@@ -22,6 +22,11 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: Admin
+    },
+    {
+        path: '/detail/:param',
+        name: 'Detail',
+        component: () => import('../components/Detail.vue')
     }
 ];
 
