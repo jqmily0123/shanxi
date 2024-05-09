@@ -10,26 +10,24 @@
       <div
         v-for="item in childData"
         :key="item.id"
-        :class="[item.equipmentStatus === '故障' ? 'isActive' : '', 'tr']"
+        :class="[item.deviceStatus === '设备故障' ? 'isActive' : '', 'tr']"
       >
-        <span>{{ item.id }}</span>
+        <span>{{ item.id.slice(0, 8) }}</span>
         <span>{{ item.deviceName }}</span>
-        <span>{{ item.equipmentStatus }}</span>
-        <span>{{ item.equipmentMaintenanceStatus }}</span>
+        <span>{{ item.deviceStatus }}</span>
+        <span>{{ item.deviceMaintenanceStatus }}</span>
       </div>
     </vue3-seamless-scroll>
   </div>
 </template>
 <script setup>
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
-// import { defineProps } from "vue";
 
-// console.log(Vue3SeamlessScroll);
 const props = defineProps({
   item: Object,
 });
 const { childData } = props.item;
-// console.log(childData);
+console.log(childData);
 </script>
 <style scoped lang="less">
 li {

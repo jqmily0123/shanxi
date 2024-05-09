@@ -1,13 +1,7 @@
 <template>
   <div class="login_register">
     <div class="login" v-if="isLogin">
-      <a-form
-        class="form"
-        :model="formState"
-        autocomplete="off"
-        :rules="rules"
-        ref="loginRef"
-      >
+      <a-form class="form" :model="formState" autocomplete="off" ref="loginRef">
         <a-form-item name="username">
           <span>用户名</span>
           <a-input v-model:value="formState.username"></a-input>
@@ -62,13 +56,15 @@
 </template>
 <script setup>
 import { ref, reactive } from "vue";
+import { useStore } from "vuex";
+
 const isLogin = ref(true);
 import { message } from "ant-design-vue";
 import request from "@/apis/request.js";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "vue-router";
 const router = useRouter();
-
+const store = useStore();
 const formState = reactive({
   username: "",
   password: "",
@@ -149,7 +145,7 @@ const handleRegister = async () => {
     const user = await request.post("/register", formState);
     console.log(user);
     message.success("注册成功");
-    await router.push("/");
+    await router.push("/home");
   } catch (error) {
     message.warn("表单验证失败");
   }
@@ -168,15 +164,17 @@ const handleLogin = async () => {
   }
   try {
     await loginRef.value.validate();
-    const user = await request.post("/login", formState);
-    console.log(user);
-    if (user.code == 200) {
+    const res = await request.post("/login", formState);
+    if (res.code === 200) {
       message.success("登陆成功");
-      await router.push("/");
+      await router.push("/home");
+      store.commit("addUser", res.data);
+      console.log(store.getters.user);
     } else {
       message.warn("用户名或者密码不正确");
     }
   } catch (error) {
+    console.log(error);
     message.warn("表单验证失败");
   }
 };

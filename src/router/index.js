@@ -3,13 +3,15 @@ import { createRouter, createWebHistory } from "vue-router";
 
 // 引入你的组件
 import Home from "../view/Home.vue";
-import Admin from "../view/Admin.vue";
 import Login from "../view/Login.vue";
-// Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
+    redirect: "/login", // 从根路径重定向到 /login
+  },
+  {
+    path: "/home",
     name: "Home",
     component: Home,
   },
@@ -17,11 +19,6 @@ const routes = [
     path: "/login",
     name: "Login",
     component: Login,
-  },
-  {
-    path: "/admin",
-    name: "Admin",
-    component: Admin,
   },
   {
     path: "/detail/:param",

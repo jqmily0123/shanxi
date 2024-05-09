@@ -1,5 +1,5 @@
 <template>
-  <div class="energy-consumption">
+  <div class="energy-power">
     <div class="items">
       <div v-for="item in childData" :key="item.id" class="item">
         <div class="equipment">
@@ -12,9 +12,9 @@
             <div class="m_top_left"></div>
             <div class="m_top_right">
               {{
-                item.consumption > 25
+                item.power > 25
                   ? "高能耗"
-                  : item.consumption > 20
+                  : item.power > 20
                     ? "中等能耗"
                     : "低能耗"
               }}
@@ -22,7 +22,7 @@
           </div>
           <ProcessBar :progress="item" :color="item.color" />
         </div>
-        <div class="right">{{ item.consumption }}Kwh</div>
+        <div class="right">{{ item.power }}千Kwh</div>
       </div>
     </div>
   </div>
@@ -32,11 +32,12 @@ import ProcessBar from "@/components/ProcessBar.vue";
 const { item } = defineProps({
   item: Object,
 });
+console.log(item);
 const { childData } = item;
-console.log(childData);
+// console.log(childData);
 </script>
 <style scoped lang="less">
-.energy-consumption {
+.energy-power {
   width: 400px;
   height: 180px;
   margin-top: 20px;

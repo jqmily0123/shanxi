@@ -17,5 +17,7 @@ app.component("StatusData", StatusData);
 app.component("AlarmData", AlarmData);
 app.component("DeviceFault", DeviceFault);
 import Antd from "ant-design-vue";
+import store from "@/store";
+app.use(store);
 app.use(Antd);
 app.use(router).mount("#app");

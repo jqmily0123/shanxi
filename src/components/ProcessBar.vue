@@ -10,14 +10,10 @@ const progressBar = ref(null);
 const { progress } = defineProps({
   progress: Object,
 });
-const { consumption } = progress;
+const { power } = progress;
 
-const calculateColor = (consumption) => {
-  return consumption > 25
-    ? "#FF0000"
-    : consumption > 20
-      ? "#00FFF7"
-      : "#32ED93";
+const calculateColor = (power) => {
+  return power > 25 ? "#FF0000" : power > 20 ? "#00FFF7" : "#32ED93";
 };
 
 let canvas;
@@ -56,8 +52,7 @@ function drawProgressBar(
   x -= 10;
   for (let i = 0; i <= divisions; i++) {
     // 根据进度填充平行四边形
-    ctx.fillStyle =
-      i / divisions < progress ? calculateColor(consumption) : "#eee"; // 动态设置填充颜色
+    ctx.fillStyle = i / divisions < progress ? calculateColor(power) : "#eee"; // 动态设置填充颜色
 
     // 计算平行四边形的起始位置，考虑到前面添加的三角形
     let parallelogramStart = x + i * parallelogramWidth;
@@ -103,7 +98,7 @@ onMounted(() => {
   ctx = canvas.getContext("2d");
   if (!canvas.getContext) return; // 检查canvas支持
   // drawProcessLines(canvas, 6);
-  drawProgressBar(consumption / 35, 220, 12, canvas, ctx);
+  drawProgressBar(power / 35, 220, 12, canvas, ctx);
 });
 </script>
 <style scoped lang="less">

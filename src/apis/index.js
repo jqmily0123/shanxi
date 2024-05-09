@@ -3,7 +3,14 @@ import { getCityEnergyConsumption } from "./CityWaterEnergyConsumption";
 import { getCityWaterTemperature } from "./CityWaterTemperature";
 import { getCityWaterPressure } from "./CityWaterPressure";
 import { getDeviceCount } from "@/apis/deviceCount.js";
-import { getDeviceInfo } from "./deviceInfo.js";
+import {
+  getDeviceInfo,
+  updateDeviceInfo,
+  deleteDeviceInfoById,
+} from "./deviceInfo.js";
+import { getUsers, deleteUserById } from "@/apis/user.js";
+import { getHomeData } from "@/apis/home.js";
+
 export {
   getCityWaterPressure,
   getCityEnergyConsumption,
@@ -11,4 +18,9 @@ export {
   getCityWaterConsume,
   getDeviceCount,
   getDeviceInfo,
+  updateDeviceInfo,
+  deleteDeviceInfoById,
+  getUsers,
+  deleteUserById,
+  getHomeData,
 };

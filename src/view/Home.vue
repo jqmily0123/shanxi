@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="main">
+    <div class="main" v-if="rdata">
       <div class="left">
         <div v-for="item in leftData" :key="item.id" class="item">
           <HomeCardBox :item="item"></HomeCardBox>
@@ -22,40 +22,19 @@ import Header from "@/components/Header.vue";
 import HomeCardBox from "@/components/HomeCardBox.vue";
 import GSMap from "@/components/GSMap.vue";
 import { v4 as uuidv4 } from "uuid";
+import { onMounted, ref } from "vue";
+import { getHomeData } from "@/apis/index.js";
 
-const getDeviceNumber = () => {
-  return Math.floor(Math.random() * 100);
-};
-const getRandom = () => {
-  return Math.random() - 0.5;
-};
 const deviceData = [];
-const faultData = [];
-//获取设备信息
-const getDeviceData = () => {
-  const deviceName = ["净水器", "增压器", "加热器", "过滤器", "电子阀门"];
-  for (let i = 0; i < 50; i++) {
-    const random = getRandom();
-    deviceData.push({
-      id: `00${i + 1}`,
-      deviceName: `${
-        deviceName[Math.floor(Math.random() * 5)]
-      }#${getDeviceNumber()}`,
-      equipmentStatus: random < -0.2 ? "故障" : "正常",
-      equipmentMaintenanceStatus: random < -0.2 ? "维修中" : "正常",
-    });
-  }
-};
-// 获取设备故障信息
-const getFaultData = () => {
-  deviceData.filter((item) => {
-    if (item.equipmentStatus === "故障") {
-      faultData.push(item);
+
+const getFaultData = (deviceInfos) => {
+  return deviceInfos.filter((item) => {
+    if (item.deviceStatus === "设备故障") {
+      return item;
     }
   });
 };
-getDeviceData();
-getFaultData();
+
 const data = [
   {
     id: uuidv4(),
@@ -84,7 +63,6 @@ const data = [
       {
         id: uuidv4(),
         component: "WaterTemperature",
-        waterVolume: 0.65,
         subTitle: "冷水温度",
         width: "175px",
         height: "175px",
@@ -97,7 +75,6 @@ const data = [
       {
         id: uuidv4(),
         component: "WaterTemperature",
-        waterVolume: 0.85,
         subTitle: "热水温度",
         width: "175px",
         height: "175px",
@@ -117,7 +94,7 @@ const data = [
         id: uuidv4(),
         component: "CircleProcess",
         subTitle: "冷水压力",
-        pressure: "3",
+        pressure: 0,
         maxPressure: "6",
         color: "#0EFF09",
         bgColor: "#979797",
@@ -190,7 +167,7 @@ const data = [
       {
         id: uuidv4(),
         component: "DeviceFault",
-        childData: faultData,
+        childData: [],
       },
     ],
   },
@@ -200,9 +177,28 @@ const data = [
     component: "HomeCardBox",
   };
 });
-
-const leftData = data.slice(0, 3);
-const rightData = data.slice(3, data.length);
+// console.log(data);
+const homeData = ref(data);
+const updateHomeData = (deviceInfos, homePageS, powerConsumes) => {
+  homeData.value[0].children[0].waterVolume = homePageS.coldWaterVolume;
+  homeData.value[0].children[1].waterVolume = homePageS.hotWaterVolume;
+  homeData.value[1].children[0].temperature = homePageS.coldWaterTemperature;
+  homeData.value[1].children[1].temperature = homePageS.hotWaterTemperature;
+  homeData.value[2].children[0].pressure = homePageS.coldWaterPressure;
+  homeData.value[2].children[1].pressure = homePageS.hotWaterPressure;
+  homeData.value[3].children[0].childData = powerConsumes;
+  homeData.value[4].children[0].childData = deviceInfos;
+  homeData.value[5].children[0].childData = getFaultData(deviceInfos);
+};
+let rdata = ref();
+onMounted(async () => {
+  rdata.value = await getHomeData();
+  const { deviceInfos, homePageS, powerConsumes } = rdata.value;
+  updateHomeData(deviceInfos, homePageS, powerConsumes);
+});
+console.log(homeData);
+const leftData = homeData.value.slice(0, 3);
+const rightData = homeData.value.slice(3, data.length);
 </script>
 <style scoped lang="less">
 .home {

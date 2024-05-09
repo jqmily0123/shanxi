@@ -1,19 +1,26 @@
 <template>
-  <div class="container" v-show="showDeletion">
+  <div class="container" v-if="showDeletion">
     <div class="title">您确认删除该条记录吗</div>
     <div class="btns">
-      <a-button @click="handelDeletion">删除</a-button>
+      <a-button @click="handelDelete">删除</a-button>
       <a-button @click="handleCancel">取消</a-button>
     </div>
   </div>
 </template>
 <script setup>
+import { defineEmits } from "vue";
+const emit = defineEmits(["onDelete", "onCancel"]);
 const props = defineProps({
   showDeletion: Boolean,
-  handleCancel: Function,
+  deleteId: String,
 });
-const handelDeletion = () => {
-  props.handleCancel();
+// console.log(props.showDeletion);
+const handelDelete = () => {
+  emit("onDelete", props.deleteId);
+};
+
+const handleCancel = () => {
+  emit("onCancel");
 };
 </script>
 <style lang="less" scoped>

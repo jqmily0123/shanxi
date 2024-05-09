@@ -20,6 +20,9 @@ const { color, bgColor, pressure, maxPressure } = props.item;
 
 const drawCircleLine = () => {
   const canvas = dial.value;
+  if (!canvas) {
+    return;
+  }
   const ctx = canvas.getContext("2d");
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;

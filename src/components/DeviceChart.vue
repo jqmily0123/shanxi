@@ -12,7 +12,9 @@ import { ref, onMounted } from "vue";
 const props = defineProps({
   deviceData: Object,
 });
+
 const deviceData = props.deviceData;
+console.log("deviceData", deviceData);
 const series = [];
 const hotData = [];
 const coldData = [];
@@ -47,7 +49,10 @@ const initOption = () => {
   const deviceChart = echarts.init(chartDom.value);
   const option = {
     title: {
-      text: deviceData.name,
+      text: deviceData[0].cityName,
+      textStyle: {
+        color: "white",
+      },
     },
     tooltip: {
       trigger: "axis",

@@ -10,39 +10,56 @@
             <device :device="device"></device>
           </li>
         </ul>
-        <div class="device_main" v-if="historyData">
-          <device-chart
-            :deviceData="historyData"
-            :key="deviceKey"
-          ></device-chart>
-          <device-info
-            class="device_info"
-            :deviceInfos="deviceInfos"
-            :handleShow="changeShowUpdate"
-            :handleCancel="changeShowDeletion"
-          ></device-info>
+        <div class="main">
+          <div v-if="isUserAdmin">
+            <UserAdmin
+              :users="users"
+              v-if="users"
+              @onDeleteUser="deleteUser"
+            ></UserAdmin>
+          </div>
+          <div class="device_main" v-else>
+            <device-chart
+              v-if="historyData"
+              :deviceData="historyData"
+              :key="deviceKey"
+            ></device-chart>
+            <device-info
+              v-if="deviceInfos.list"
+              class="device_info"
+              :deviceInfos="deviceInfos"
+              @handleUpdate="changeShowUpdate"
+              @handleDelete="showDelete"
+              :key="deviceInfoKey"
+            ></device-info>
+          </div>
         </div>
       </a-layout-content>
     </a-layout>
     <update-box
-      :handleShow="changeShowUpdate"
+      @cancel="onCancel"
+      @updateDeviceInfo="onUpdateDeviceInfo"
       :updateData="updateData"
+      :key="updateKey"
     ></update-box>
     <confirm-deletion
-      :handleCancel="changeShowDeletion"
       :showDeletion="showDeletion"
+      :deleteId="deleteId"
+      @onDelete="deleteDeviceInfo"
+      @onCancel="cancelDeleteDeviceInfo"
     ></confirm-deletion>
   </div>
 </template>
 <script setup>
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import DeviceInfo from "@/components/DeviceInfo.vue";
-import UpdateBox from "@/components/updateBox.vue";
+import UpdateBox from "@/components/UpdateBox.vue";
 import ConfirmDeletion from "@/components/ConfirmDeletion.vue";
 import { v4 as uuidv4 } from "uuid";
 import LeftSider from "@/components/LeftSider.vue";
 import Device from "@/components/Device.vue";
 import DeviceChart from "@/components/DeviceChart.vue";
+import UserAdmin from "@/components/UserAdmin.vue";
 import { onMounted, reactive, ref } from "vue";
 import {
   getCityWaterPressure,
@@ -51,9 +68,14 @@ import {
   getCityWaterConsume,
   getDeviceCount,
   getDeviceInfo,
+  updateDeviceInfo,
+  deleteDeviceInfoById,
+  getUsers,
+  deleteUserById,
 } from "@/apis";
 
 const route = useRoute();
+const router = useRouter();
 const layout = {
   background: "none",
 };
@@ -85,6 +107,10 @@ const leftData = [
     id: uuidv4(),
     name: "设备能耗信息管理",
   },
+  {
+    id: uuidv4(),
+    name: "返回首页",
+  },
 ];
 const devices = reactive([
   {
@@ -111,18 +137,29 @@ const devices = reactive([
 
 const deviceInfos = reactive({});
 deviceInfos.th = ["设备编号", "设备名称", "设备状态", "设备检修状态"];
-deviceInfos.list = [];
 
-const showUpdate = ref(false);
-const changeShowUpdate = () => {
-  showUpdate.value = !showUpdate.value;
+const updateKey = ref(0);
+const changeShowUpdate = (item) => {
+  updateData.id = item.id;
+  updateData.deviceName = item.deviceName;
+  updateData.deviceStatus = item.deviceStatus;
+  updateData.deviceMaintenanceStatus = item.deviceMaintenanceStatus;
+  updateData.showUpdate = !updateData.showUpdate;
+  updateKey.value++;
 };
-const updateData = ref({
-  showUpdate,
+
+const updateData = reactive({
+  showUpdate: false,
+  id: "",
+  deviceName: "",
+  deviceStatus: "",
+  deviceMaintenanceStatus: "",
 });
 
 const showDeletion = ref(false);
-const changeShowDeletion = () => {
+const deleteId = ref();
+const showDelete = (item) => {
+  deleteId.value = item.id;
   showDeletion.value = !showDeletion.value;
 };
 
@@ -137,20 +174,21 @@ const methedMap = {
 const historyData = ref();
 const deviceKey = ref(0);
 const leftChange = async (item) => {
-  const param = route.params.param;
-  historyData.value = await methedMap[item.name](param);
-  deviceKey.value++;
+  if (item.name === "返回首页") {
+    router.push("/home");
+    return;
+  }
+  if (item.name !== "用户数据管理") {
+    isUserAdmin.value = false;
+    const param = route.params.param;
+    historyData.value = await methedMap[item.name](param);
+    deviceKey.value++;
+  } else {
+    isUserAdmin.value = true;
+  }
 };
 const deviceCount = ref();
-// for (let i = 0; i < 100; i++) {
-//   const deviceInfo = {
-//     id: uuidv4().slice(0, 8),
-//     deviceName: "净水器",
-//     deviceStatus: "正常",
-//     deviceMaintenanceStatus: "正在检修",
-//   };
-//   deviceInfos.list.push(deviceInfo);
-// }
+
 const mapResultToShow = (devices, deviceCount) => {
   devices[0].count = deviceCount.value.totalDevicesCount;
   devices[1].count = deviceCount.value.offlineDevicesCount;
@@ -158,14 +196,54 @@ const mapResultToShow = (devices, deviceCount) => {
   devices[3].count = deviceCount.value.shutdownDevicesCount;
   devices[4].count = deviceCount.value.warningDevicesCount;
 };
+
+//处理更新逻辑
+const deviceInfoKey = ref(0);
+const onUpdateDeviceInfo = async (data) => {
+  const [changeData, preData] = data;
+  if (
+    changeData.deviceName === preData.deviceName &&
+    changeData.deviceStatus === preData.deviceStatus &&
+    changeData.deviceMaintenanceStatus === preData.deviceMaintenanceStatus
+  ) {
+    return;
+  }
+  const res = await updateDeviceInfo(changeData);
+  deviceInfos.list = await getDeviceInfo(param.value);
+  deviceInfoKey.value++;
+  updateData.showUpdate = false;
+};
+const onCancel = () => {
+  updateData.showUpdate = false;
+};
+
+//处理删除逻辑
+const deleteDeviceInfo = async (item) => {
+  await deleteDeviceInfoById(item);
+  deviceInfos.list = await getDeviceInfo(param.value);
+  deviceInfoKey.value++;
+  showDeletion.value = false;
+};
+const cancelDeleteDeviceInfo = () => {
+  showDeletion.value = false;
+};
+const param = ref();
 onMounted(async () => {
-  const param = route.params.param;
-  historyData.value = await methedMap["用户数据管理"](param);
+  param.value = route.params.param;
+  historyData.value = await methedMap["用户数据管理"](param.value);
   deviceCount.value = await getDeviceCount();
   mapResultToShow(devices, deviceCount);
-  deviceInfos.list = await getDeviceInfo(param);
-  console.log(deviceInfos);
+  deviceInfos.list = await getDeviceInfo(param.value);
+  //获取用户数据
+  users.value = await getUsers();
+  // console.log(users.value);
 });
+const isUserAdmin = ref(true);
+const users = ref();
+const deleteUser = async (user) => {
+  await deleteUserById(user.id);
+  users.value = await getUsers();
+};
 </script>
 <style scoped lang="less">
 .detail {
@@ -193,14 +271,19 @@ onMounted(async () => {
       margin-top: 80px;
       //border:1px solid red;
     }
-
-    .device_main {
+    .main {
       width: 100%;
-      padding: 0 100px;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      .device_main {
+        width: 100%;
+        padding: 0 50px;
+        display: flex;
 
-      .device_info {
-        flex: 1;
+        .device_info {
+          flex: 1;
+        }
       }
     }
   }

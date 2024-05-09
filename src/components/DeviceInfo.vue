@@ -8,13 +8,13 @@
     </div>
     <vue3SeamlessScroll :list="list" class="lists" v-bind="classOption">
       <div v-for="item in list" class="list">
-        <div>{{ item.id }}</div>
+        <div>{{ item.id.slice(0, 8) }}</div>
         <div>{{ item.deviceName }}</div>
         <div>{{ item.deviceStatus }}</div>
         <div>{{ item.deviceMaintenanceStatus }}</div>
         <div class="option">
-          <span @click="handleShow">修改</span>
-          <span @click="handleCancel">删除</span>
+          <span @click="update(item)">修改</span>
+          <span @click="deleteDevice(item)">删除</span>
         </div>
       </div>
     </vue3SeamlessScroll>
@@ -22,17 +22,24 @@
 </template>
 <script setup>
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import { defineEmits } from "vue";
+const emit = defineEmits(["handleUpdate", "handleDelete"]);
 const props = defineProps({
   deviceInfos: Object,
-  handleShow: Function,
-  handleCancel: Function,
 });
+
 const classOption = {
   step: 0.5, // 滚动速度
   hover: true, // 鼠标悬停是否停止滚动
   wheel: true, // 启用鼠标滚轮滚动
 };
 const { th, list } = props.deviceInfos;
+const update = (item) => {
+  emit("handleUpdate", item);
+};
+const deleteDevice = (item) => {
+  emit("handleDelete", item);
+};
 </script>
 <style lang="less" scoped>
 .container {
@@ -45,7 +52,6 @@ const { th, list } = props.deviceInfos;
       display: flex;
       padding: 10px 0;
       background-color: #00201f;
-      //height: 23px;
       box-sizing: border-box;
       color: #fff;
       font-size: 15px;

@@ -3,7 +3,7 @@
     <div class="title">设备状态信息修改</div>
     <a-form :model="deviceData">
       <a-form-item label="设备ID" name="deviceId">
-        <a-input v-model:value="deviceData.deviceId" disabled />
+        <a-input v-model:value="deviceData.id" disabled />
       </a-form-item>
       <a-form-item label="设备名称" name="deviceName">
         <a-input v-model:value="deviceData.deviceName" />
@@ -30,21 +30,26 @@
   </div>
 </template>
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, defineEmits } from "vue";
 
 const props = defineProps({
   updateData: Object,
-  handleShow: Function,
 });
+// console.log(props.updateData);
+const emit = defineEmits(["updateDeviceInfo", "cancel"]);
+
+const { id, deviceName, deviceStatus, deviceMaintenanceStatus } =
+  props.updateData;
+
 const deviceData = reactive({
-  deviceId: "123456",
-  deviceName: "12345",
-  deviceStatus: "设备正常",
+  id: id,
+  deviceName: deviceName,
+  deviceStatus: deviceStatus,
   deviceStatusOptions: [
     { label: "设备正常", value: "设备正常" },
     { label: "设备异常", value: "设备异常" },
   ],
-  deviceMaintenanceStatus: "设备未检修",
+  deviceMaintenanceStatus: deviceMaintenanceStatus,
   deviceMaintenanceStatusOptions: [
     { label: "设备未检修", value: "设备未检修" },
     { label: "设备正在检修", value: "设备正在检修" },
@@ -52,12 +57,11 @@ const deviceData = reactive({
   ],
 });
 const onUpdate = () => {
-  props.handleShow();
+  emit("updateDeviceInfo", [deviceData, props.updateData]);
 };
 
 const onCancel = () => {
-  console.log(props.updateData);
-  props.handleShow();
+  emit("cancel");
 };
 </script>
 <style lang="less" scoped>
