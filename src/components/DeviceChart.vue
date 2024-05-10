@@ -13,12 +13,12 @@ const props = defineProps({
   deviceData: Object,
 });
 
-const deviceData = props.deviceData;
-console.log("deviceData", deviceData);
+const { title, list } = props.deviceData;
+
 const series = [];
 const hotData = [];
 const coldData = [];
-for (let item of deviceData) {
+for (let item of list) {
   hotData.push(
     item.coldWaterConsume ||
       item.coldWaterPressure ||
@@ -49,7 +49,7 @@ const initOption = () => {
   const deviceChart = echarts.init(chartDom.value);
   const option = {
     title: {
-      text: deviceData[0].cityName,
+      text: `${list[0].cityName} ${title}`,
       textStyle: {
         color: "white",
       },
@@ -78,10 +78,18 @@ const initOption = () => {
     },
     xAxis: {
       type: "category",
-      data: deviceData.map((item) => item.month),
+      data: list.map((item) => item.month),
+      axisLabel: {
+        color: "white", // 设置文字颜色
+        fontSize: 14, // 设置文字大小
+      },
     },
     yAxis: {
       type: "value",
+      axisLabel: {
+        color: "white", // 设置文字颜色
+        fontSize: 14, // 设置文字大小
+      },
     },
     series: series,
   };

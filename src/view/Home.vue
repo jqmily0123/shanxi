@@ -198,7 +198,7 @@ onMounted(async () => {
 });
 console.log(homeData);
 const leftData = homeData.value.slice(0, 3);
-const rightData = homeData.value.slice(3, data.length);
+const rightData = homeData.value.slice(3, homeData.value.length);
 </script>
 <style scoped lang="less">
 .home {

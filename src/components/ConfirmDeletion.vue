@@ -9,18 +9,18 @@
 </template>
 <script setup>
 import { defineEmits } from "vue";
-const emit = defineEmits(["onDelete", "onCancel"]);
+const emit = defineEmits(["onDelete", "oonCancelDelete"]);
 const props = defineProps({
   showDeletion: Boolean,
   deleteId: String,
 });
-// console.log(props.showDeletion);
+
 const handelDelete = () => {
   emit("onDelete", props.deleteId);
 };
 
 const handleCancel = () => {
-  emit("onCancel");
+  emit("onCancelDelete");
 };
 </script>
 <style lang="less" scoped>

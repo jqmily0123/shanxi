@@ -23,7 +23,7 @@ const routes = [
   {
     path: "/detail/:param",
     name: "Detail",
-    component: () => import("../components/Detail.vue"),
+    component: () => import("../view/Detail.vue"),
     props: true,
   },
 ];

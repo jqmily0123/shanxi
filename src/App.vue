@@ -2,10 +2,12 @@
   <div class="app">
     <Header></Header>
     <RouterView></RouterView>
+    <!--    <test></test>-->
   </div>
 </template>
 
 <script setup>
+import Test from "@/view/Test.vue";
 import Header from "@/components/Header.vue";
 </script>
 <style>
@@ -19,8 +21,6 @@ import Header from "@/components/Header.vue";
 body,
 html,
 #app {
-  width: 100%;
-  height: 100%;
   overflow-y: hidden;
   overflow-x: hidden;
 }

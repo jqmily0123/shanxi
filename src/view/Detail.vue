@@ -16,11 +16,12 @@
               :users="users"
               v-if="users"
               @onDeleteUser="deleteUser"
+              @onUpdateUser="updateUser"
             ></UserAdmin>
           </div>
           <div class="device_main" v-else>
             <device-chart
-              v-if="historyData"
+              v-if="historyData.list"
               :deviceData="historyData"
               :key="deviceKey"
             ></device-chart>
@@ -37,8 +38,9 @@
       </a-layout-content>
     </a-layout>
     <update-box
-      @cancel="onCancel"
-      @updateDeviceInfo="onUpdateDeviceInfo"
+      v-if="updateData.showUpdate"
+      @onCancelUpdateDevice="cancelUpdateDevice"
+      @onUpdateDevice="updateDevice"
       :updateData="updateData"
       :key="updateKey"
     ></update-box>
@@ -46,7 +48,7 @@
       :showDeletion="showDeletion"
       :deleteId="deleteId"
       @onDelete="deleteDeviceInfo"
-      @onCancel="cancelDeleteDeviceInfo"
+      @onCancelDelete="cancelDeleteDeviceInfo"
     ></confirm-deletion>
   </div>
 </template>
@@ -61,6 +63,7 @@ import Device from "@/components/Device.vue";
 import DeviceChart from "@/components/DeviceChart.vue";
 import UserAdmin from "@/components/UserAdmin.vue";
 import { onMounted, reactive, ref } from "vue";
+import { message } from "ant-design-vue";
 import {
   getCityWaterPressure,
   getCityEnergyConsumption,
@@ -72,7 +75,7 @@ import {
   deleteDeviceInfoById,
   getUsers,
   deleteUserById,
-} from "@/apis";
+} from "@/apis/index.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -139,22 +142,21 @@ const deviceInfos = reactive({});
 deviceInfos.th = ["设备编号", "设备名称", "设备状态", "设备检修状态"];
 
 const updateKey = ref(0);
-const changeShowUpdate = (item) => {
-  updateData.id = item.id;
-  updateData.deviceName = item.deviceName;
-  updateData.deviceStatus = item.deviceStatus;
-  updateData.deviceMaintenanceStatus = item.deviceMaintenanceStatus;
-  updateData.showUpdate = !updateData.showUpdate;
-  updateKey.value++;
-};
-
-const updateData = reactive({
+const updateData = ref({
   showUpdate: false,
   id: "",
   deviceName: "",
   deviceStatus: "",
   deviceMaintenanceStatus: "",
 });
+const changeShowUpdate = (item) => {
+  updateData.value.id = item.id;
+  updateData.value.deviceName = item.deviceName;
+  updateData.value.deviceStatus = item.deviceStatus;
+  updateData.value.deviceMaintenanceStatus = item.deviceMaintenanceStatus;
+  updateData.value.showUpdate = !updateData.value.showUpdate;
+  updateKey.value++;
+};
 
 const showDeletion = ref(false);
 const deleteId = ref();
@@ -175,13 +177,14 @@ const historyData = ref();
 const deviceKey = ref(0);
 const leftChange = async (item) => {
   if (item.name === "返回首页") {
-    router.push("/home");
+    await router.push("/home");
     return;
   }
   if (item.name !== "用户数据管理") {
     isUserAdmin.value = false;
     const param = route.params.param;
-    historyData.value = await methedMap[item.name](param);
+    historyData.value.title = item.name;
+    historyData.value.list = await methedMap[item.name](param);
     deviceKey.value++;
   } else {
     isUserAdmin.value = true;
@@ -199,22 +202,25 @@ const mapResultToShow = (devices, deviceCount) => {
 
 //处理更新逻辑
 const deviceInfoKey = ref(0);
-const onUpdateDeviceInfo = async (data) => {
+const updateDevice = async (data) => {
   const [changeData, preData] = data;
+  console.log(changeData, preData);
   if (
     changeData.deviceName === preData.deviceName &&
     changeData.deviceStatus === preData.deviceStatus &&
     changeData.deviceMaintenanceStatus === preData.deviceMaintenanceStatus
   ) {
+    message.warn("您没有改变任何设备信息哦");
     return;
   }
-  const res = await updateDeviceInfo(changeData);
+  await updateDeviceInfo(changeData);
+  message.success("设备信息修改成功");
   deviceInfos.list = await getDeviceInfo(param.value);
   deviceInfoKey.value++;
-  updateData.showUpdate = false;
+  updateData.value.showUpdate = !updateData.value.showUpdate;
 };
-const onCancel = () => {
-  updateData.showUpdate = false;
+const cancelUpdateDevice = () => {
+  updateData.value.showUpdate = !updateData.value.showUpdate;
 };
 
 //处理删除逻辑
@@ -239,11 +245,14 @@ onMounted(async () => {
   // console.log(users.value);
 });
 const isUserAdmin = ref(true);
+//用户逻辑操作
 const users = ref();
 const deleteUser = async (user) => {
   await deleteUserById(user.id);
   users.value = await getUsers();
 };
+
+const updateUser = async (user) => {};
 </script>
 <style scoped lang="less">
 .detail {

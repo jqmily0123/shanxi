@@ -14,6 +14,7 @@
         <div>{{ user.username }}</div>
         <div class="option">
           <span @click="deleteUser(user)">删除</span>
+          <span @click="updateUser(user)">修改</span>
         </div>
       </div>
     </vue3-seamless-scroll>
@@ -28,6 +29,9 @@ const props = defineProps({
 });
 const deleteUser = (user) => {
   emit("onDeleteUser", user);
+};
+const updateUser = (user) => {
+  emit("onUpdateUser", user);
 };
 </script>
 <style lang="less" scoped>
