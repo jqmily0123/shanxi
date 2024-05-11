@@ -1,7 +1,8 @@
 <template>
   <div class="user">
     <span class="avatar">
-      <img :src="user.avatar" />
+      <img :src="user.avatar" v-if="user.avatar" />
+      <img src="@/assets/avatar.jpg" v-else />
     </span>
     <div class="username" v-if="user.username">
       <span>{{ user.username }}</span>

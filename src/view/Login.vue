@@ -173,7 +173,6 @@ const handleLogin = async () => {
       message.warn("用户名或者密码不正确");
     }
   } catch (error) {
-    console.log(error);
     message.warn("表单验证失败");
   }
 };

@@ -29,7 +29,7 @@ const props = defineProps({
 });
 
 const classOption = {
-  step: 0.5, // 滚动速度
+  step: 0.1, // 滚动速度
   hover: true, // 鼠标悬停是否停止滚动
   wheel: true, // 启用鼠标滚轮滚动
 };

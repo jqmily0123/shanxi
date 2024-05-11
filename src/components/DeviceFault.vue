@@ -6,7 +6,7 @@
       <span>设备状态</span>
       <span>设备检修状态</span>
     </div>
-    <vue3-seamless-scroll class="t_body" :list="childData">
+    <vue3-seamless-scroll class="t_body" :list="childData" :step="0.3">
       <div
         v-for="item in childData"
         :key="item.id"

@@ -5,16 +5,13 @@ import WaterBall from "@/components/WaterBall.vue";
 import WaterTemperature from "@/components/WaterTemperature.vue";
 import CircleProcess from "@/components/CircleProcess.vue";
 import EnergyConsumption from "@/components/EnergyConsumption.vue";
-import StatusData from "@/components/StatusData.vue";
-import AlarmData from "@/components/AlarmData.vue";
+
 import DeviceFault from "@/components/DeviceFault.vue";
 const app = createApp(App);
 app.component("WaterBall", WaterBall);
 app.component("WaterTemperature", WaterTemperature);
 app.component("CircleProcess", CircleProcess);
 app.component("EnergyConsumption", EnergyConsumption);
-app.component("StatusData", StatusData);
-app.component("AlarmData", AlarmData);
 app.component("DeviceFault", DeviceFault);
 import Antd from "ant-design-vue";
 import store from "@/store";

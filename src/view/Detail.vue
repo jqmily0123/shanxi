@@ -260,17 +260,16 @@ const users = ref();
 const deleteUser = async (user) => {
   await deleteUserById(user.id);
   users.value = await getUsers();
+  message.warn("删除用户成功");
 };
 const user = ref({});
 const showUpdateUser = ref(false);
-
 const openUpdateUserBox = async (u) => {
   showUpdateUser.value = !showUpdateUser.value;
   user.value.id = u.id;
   user.value.username = u.username;
   user.value.avatar = u.avatar;
 };
-
 const updateUser = async (user) => {
   await updateUserById(user);
   message.success("用户信息修改成功");
