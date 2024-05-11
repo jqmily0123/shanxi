@@ -142,10 +142,10 @@ const handleRegister = async () => {
     await registerRef.value.validate();
     //给用户生成一个ID
     formState.id = uuidv4();
-    const user = await request.post("/register", formState);
-    console.log(user);
+    const res = await request.post("/register", formState);
     message.success("注册成功");
     await router.push("/home");
+    store.commit("addUser", res.data);
   } catch (error) {
     message.warn("表单验证失败");
   }
@@ -169,7 +169,6 @@ const handleLogin = async () => {
       message.success("登陆成功");
       await router.push("/home");
       store.commit("addUser", res.data);
-      console.log(store.getters.user);
     } else {
       message.warn("用户名或者密码不正确");
     }

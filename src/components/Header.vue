@@ -14,6 +14,7 @@ import { useStore } from "vuex";
 import UserButton from "@/components/UserButton.vue";
 const store = useStore();
 const user = computed(() => store.getters.user);
+console.log(user);
 const date = ref();
 setInterval(() => {
   date.value = dayjs().format("YYYY[年]MM[月]DD[日] HH:mm:ss dddd");
@@ -26,13 +27,13 @@ setInterval(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-
+  //background-color: pink;
   .clock {
     color: white;
     font-size: 16px;
     position: absolute;
     top: 63px;
-    left: 370px;
+    left: 330px;
   }
   //background-color: #f0f0f0;
   position: relative;

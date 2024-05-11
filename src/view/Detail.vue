@@ -16,7 +16,7 @@
               :users="users"
               v-if="users"
               @onDeleteUser="deleteUser"
-              @onUpdateUser="updateUser"
+              @onUpdateUser="openUpdateUserBox"
             ></UserAdmin>
           </div>
           <div class="device_main" v-else>
@@ -50,6 +50,11 @@
       @onDelete="deleteDeviceInfo"
       @onCancelDelete="cancelDeleteDeviceInfo"
     ></confirm-deletion>
+    <user-info
+      :showUpdateUser="showUpdateUser"
+      @onUpdateUser="updateUser"
+      :userInfo="user"
+    ></user-info>
   </div>
 </template>
 <script setup>
@@ -57,6 +62,7 @@ import { useRoute, useRouter } from "vue-router";
 import DeviceInfo from "@/components/DeviceInfo.vue";
 import UpdateBox from "@/components/UpdateBox.vue";
 import ConfirmDeletion from "@/components/ConfirmDeletion.vue";
+import UserInfo from "@/components/UserInfo.vue";
 import { v4 as uuidv4 } from "uuid";
 import LeftSider from "@/components/LeftSider.vue";
 import Device from "@/components/Device.vue";
@@ -75,10 +81,14 @@ import {
   deleteDeviceInfoById,
   getUsers,
   deleteUserById,
+  updateUserById,
+  getUserByUsername,
 } from "@/apis/index.js";
+import { useStore } from "vuex";
 
 const route = useRoute();
 const router = useRouter();
+const store = useStore();
 const layout = {
   background: "none",
 };
@@ -251,8 +261,26 @@ const deleteUser = async (user) => {
   await deleteUserById(user.id);
   users.value = await getUsers();
 };
+const user = ref({});
+const showUpdateUser = ref(false);
 
-const updateUser = async (user) => {};
+const openUpdateUserBox = async (u) => {
+  showUpdateUser.value = !showUpdateUser.value;
+  user.value.id = u.id;
+  user.value.username = u.username;
+  user.value.avatar = u.avatar;
+};
+
+const updateUser = async (user) => {
+  await updateUserById(user);
+  message.success("用户信息修改成功");
+  showUpdateUser.value = false;
+  const u = await getUserByUsername(user.username);
+  //如果修改的是当前用户直接修改掉store里的user
+  if (store.getters.user.username === u.username) {
+    store.commit("addUser", u);
+  }
+};
 </script>
 <style scoped lang="less">
 .detail {

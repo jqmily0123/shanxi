@@ -8,7 +8,12 @@ import {
   updateDeviceInfo,
   deleteDeviceInfoById,
 } from "./deviceInfo.js";
-import { getUsers, deleteUserById } from "@/apis/user.js";
+import {
+  getUsers,
+  deleteUserById,
+  updateUserById,
+  getUserByUsername,
+} from "@/apis/user.js";
 import { getHomeData } from "@/apis/home.js";
 
 export {
@@ -23,4 +28,6 @@ export {
   getUsers,
   deleteUserById,
   getHomeData,
+  updateUserById,
+  getUserByUsername,
 };

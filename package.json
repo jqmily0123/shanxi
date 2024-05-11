@@ -23,9 +23,11 @@
     "segmentit": "^2.0.3",
     "uuid": "^9.0.1",
     "vue": "^3.4.21",
+    "vue-cropper": "^1.1.2",
     "vue-router": "^4.3.0",
     "vue3-seamless-scroll": "^2.0.1",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

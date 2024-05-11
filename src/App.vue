@@ -3,12 +3,14 @@
     <Header></Header>
     <RouterView></RouterView>
     <!--    <test></test>-->
+    <!--    <user-info></user-info>-->
   </div>
 </template>
 
 <script setup>
 import Test from "@/view/Test.vue";
 import Header from "@/components/Header.vue";
+import UserInfo from "@/components/UserInfo.vue";
 </script>
 <style>
 * {
@@ -23,6 +25,8 @@ html,
 #app {
   overflow-y: hidden;
   overflow-x: hidden;
+  width: 100%;
+  height: 100%;
 }
 .app {
   width: 100%;

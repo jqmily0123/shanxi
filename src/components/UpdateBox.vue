@@ -25,7 +25,7 @@
   </div>
 </template>
 <script setup>
-import { defineEmits, onMounted, reactive, ref, watch, watchEffect } from "vue";
+import { defineEmits, onMounted, ref, watchEffect } from "vue";
 import { getDeviceUpdate } from "@/config/config.js";
 
 const emit = defineEmits(["onUpdateDevice", "onCancelUpdateDevice"]);

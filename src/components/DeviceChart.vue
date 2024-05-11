@@ -8,7 +8,7 @@
 <script setup>
 import * as echarts from "echarts";
 import { ref, onMounted } from "vue";
-
+import { mapUtil } from "@/utils/index.js";
 const props = defineProps({
   deviceData: Object,
 });
@@ -49,7 +49,7 @@ const initOption = () => {
   const deviceChart = echarts.init(chartDom.value);
   const option = {
     title: {
-      text: `${list[0].cityName} ${title}`,
+      text: `${list[0].cityName} ${title} ${mapUtil(title)}`,
       textStyle: {
         color: "white",
       },
@@ -59,12 +59,24 @@ const initOption = () => {
       axisPointer: {
         type: "shadow",
       },
+      formatter: function (params) {
+        var result = params[0].name + "<br>";
+        params.forEach(function (item) {
+          result +=
+            item.marker +
+            " " +
+            item.seriesName +
+            ": " +
+            item.value +
+            mapUtil(title) +
+            "<br>";
+        });
+        return result;
+      },
     },
     legend: {
       data: ["热水量", "冷水量"],
-      itemStyle: {
-        // color: "white",
-      },
+      itemStyle: {},
       textStyle: {
         color: "white",
         fontSize: 16,
