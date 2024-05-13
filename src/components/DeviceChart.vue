@@ -8,13 +8,14 @@
 <script setup>
 import * as echarts from "echarts";
 import { ref, onMounted } from "vue";
-import { mapUtil } from "@/utils/index.js";
+import { mapUtil, getChineseByPinyin } from "@/utils/index.js";
+import { useRoute } from "vue-router";
+
 const props = defineProps({
   deviceData: Object,
 });
-console.log(typeof props.deviceData.list);
+const route = useRoute();
 const { title, list } = props.deviceData;
-console.log(list);
 const series = [];
 const hotData = [];
 const coldData = [];
@@ -22,7 +23,7 @@ for (let item of list) {
   hotData.push(item["avgHotWaterConsume"]);
   coldData.push(item["avgColdConsume"]);
 }
-// console.log(list);
+console.log(route.params);
 series.push({
   name: "热水量",
   type: "bar",
@@ -40,7 +41,7 @@ const initOption = () => {
   const deviceChart = echarts.init(chartDom.value);
   const option = {
     title: {
-      text: `${list[0].cityName} ${title} ${mapUtil(title)}`,
+      text: `${getChineseByPinyin(route.params.param)} ${title} ${mapUtil(title)}`,
       textStyle: {
         color: "white",
       },
@@ -81,7 +82,9 @@ const initOption = () => {
     },
     xAxis: {
       type: "category",
-      data: list.map((item) => item.month),
+      data: list.map((item) => {
+        return `${item.month}月`;
+      }),
       axisLabel: {
         color: "white", // 设置文字颜色
         fontSize: 14, // 设置文字大小

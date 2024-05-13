@@ -1,3 +1,4 @@
+import { getChineseByPinyin } from "./mapPinYinToCity.js";
 const chooiceToUtil = {
   水量控制信息管理: "千吨",
   温度控制信息管理: "°C",
@@ -8,4 +9,4 @@ const mapUtil = (name) => {
   return chooiceToUtil[name];
 };
 
-export { mapUtil };
+export { mapUtil, getChineseByPinyin };
