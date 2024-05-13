@@ -10,7 +10,7 @@
       <div
         v-for="item in childData"
         :key="item.id"
-        :class="[item.deviceStatus === '设备故障' ? 'isActive' : '', 'tr']"
+        :class="[item.deviceStatus === '故障' ? 'isActive' : '', 'tr']"
       >
         <span>{{ item.id.slice(0, 8) }}</span>
         <span>{{ item.deviceName }}</span>
@@ -27,7 +27,6 @@ const props = defineProps({
   item: Object,
 });
 const { childData } = props.item;
-console.log(childData);
 </script>
 <style scoped lang="less">
 li {
@@ -74,6 +73,6 @@ li {
   }
 }
 .isActive {
-  color: #ff0000;
+  color: yellow;
 }
 </style>

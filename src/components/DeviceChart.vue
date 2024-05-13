@@ -12,26 +12,17 @@ import { mapUtil } from "@/utils/index.js";
 const props = defineProps({
   deviceData: Object,
 });
-
+console.log(typeof props.deviceData.list);
 const { title, list } = props.deviceData;
 
 const series = [];
 const hotData = [];
 const coldData = [];
-for (let item of list) {
-  hotData.push(
-    item.coldWaterConsume ||
-      item.coldWaterPressure ||
-      item.coldWaterEnergyConsumption ||
-      item.coldWaterTemperature,
-  );
-  coldData.push(
-    item.hotWaterConsume ||
-      item.hotWaterPressure ||
-      item.hotWaterEnergyConsumption ||
-      item.hotWaterTemperature,
-  );
-}
+// for (let key in list) {
+//   hotData.push(list[key]["avgHotWater"]);
+//   coldData.push(list[key]["avgColdWater"]);
+// }
+// console.log(list);
 series.push({
   name: "热水量",
   type: "bar",

@@ -29,11 +29,11 @@ const bgStyle = computed(() => ({
   }
 
   p {
-    font-size: 64px;
+    font-size: 50px;
     font-weight: bold;
     position: absolute;
-    top: 48px;
-    left: 120px;
+    top: 58px;
+    left: 110px;
   }
 }
 </style>

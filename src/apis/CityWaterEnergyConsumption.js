@@ -1,6 +1,9 @@
 import request from "@/apis/request.js";
 
 const getCityEnergyConsumption = async (city) => {
-  return request.get(`/citywaterenergyconsumption/${city}`);
+  return request.get(`/citywaterenergyconsumption/infos/${city}`);
 };
-export { getCityEnergyConsumption };
+const getCityAvgEnergyConsumption = async (city) => {
+  return request.get(`/citywaterenergyconsumption/avg/${city}`);
+};
+export { getCityEnergyConsumption, getCityAvgEnergyConsumption };

@@ -28,7 +28,7 @@ const deviceData = [];
 
 const getFaultData = (deviceInfos) => {
   return deviceInfos.filter((item) => {
-    if (item.deviceStatus === "设备故障") {
+    if (item.deviceStatus === "故障") {
       return item;
     }
   });

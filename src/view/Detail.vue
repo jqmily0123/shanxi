@@ -25,14 +25,17 @@
               :deviceData="historyData"
               :key="deviceKey"
             ></device-chart>
-            <device-info
-              v-if="deviceInfos.list"
-              class="device_info"
-              :deviceInfos="deviceInfos"
-              @handleUpdate="changeShowUpdate"
-              @handleDelete="showDelete"
-              :key="deviceInfoKey"
-            ></device-info>
+            <div class="right">
+              <a-range-picker v-model:value="date" @change="dateChange" />
+              <device-info
+                class="device_info"
+                :deviceInfos="deviceInfos"
+                @handleUpdate="changeShowUpdate"
+                @handleDelete="showDelete"
+                @onChangeDate="changeDate"
+                :key="deviceInfoKey"
+              ></device-info>
+            </div>
           </div>
         </div>
       </a-layout-content>
@@ -68,7 +71,8 @@ import LeftSider from "@/components/LeftSider.vue";
 import Device from "@/components/Device.vue";
 import DeviceChart from "@/components/DeviceChart.vue";
 import UserAdmin from "@/components/UserAdmin.vue";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watchEffect } from "vue";
+import dayjs from "dayjs";
 import { message } from "ant-design-vue";
 import {
   getCityWaterPressure,
@@ -83,8 +87,14 @@ import {
   deleteUserById,
   updateUserById,
   getUserByUsername,
+  getDeviceInfoByCityAndByDate,
+  getCityWaterAvgTemperature,
+  getCityWaterAvgPressure,
+  getCityAvgEnergyConsumption,
+  getCityWaterAvgConsume,
 } from "@/apis/index.js";
 import { useStore } from "vuex";
+import moment from "moment/moment.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -140,7 +150,7 @@ const devices = reactive([
   },
   {
     bgIndex: 4,
-    name: "关闭设备数",
+    name: "故障设备数",
   },
   {
     bgIndex: 5,
@@ -148,8 +158,14 @@ const devices = reactive([
   },
 ]);
 
-const deviceInfos = reactive({});
-deviceInfos.th = ["设备编号", "设备名称", "设备状态", "设备检修状态"];
+const deviceInfos = ref({});
+deviceInfos.value.th = [
+  "设备编号",
+  "设备名称",
+  "设备状态",
+  "设备检修状态",
+  "时间",
+];
 
 const updateKey = ref(0);
 const updateData = ref({
@@ -176,14 +192,14 @@ const showDelete = (item) => {
 };
 
 const methedMap = {
-  用户数据管理: getCityEnergyConsumption,
-  水量控制信息管理: getCityWaterConsume,
-  温度控制信息管理: getCityWaterTemperature,
-  压力控制信息管理: getCityWaterPressure,
-  设备能耗信息管理: getCityEnergyConsumption,
+  用户数据管理: getUsers,
+  水量控制信息管理: getCityWaterAvgConsume,
+  温度控制信息管理: getCityWaterAvgTemperature,
+  压力控制信息管理: getCityWaterAvgPressure,
+  设备能耗信息管理: getCityAvgEnergyConsumption,
 };
 
-const historyData = ref();
+const historyData = ref({});
 const deviceKey = ref(0);
 const leftChange = async (item) => {
   if (item.name === "返回首页") {
@@ -203,10 +219,11 @@ const leftChange = async (item) => {
 const deviceCount = ref();
 
 const mapResultToShow = (devices, deviceCount) => {
+  console.log(devices);
   devices[0].count = deviceCount.value.totalDevicesCount;
   devices[1].count = deviceCount.value.offlineDevicesCount;
   devices[2].count = deviceCount.value.onlineDevicesCount;
-  devices[3].count = deviceCount.value.shutdownDevicesCount;
+  devices[3].count = deviceCount.value.defaultDevicesCount;
   devices[4].count = deviceCount.value.warningDevicesCount;
 };
 
@@ -236,7 +253,7 @@ const cancelUpdateDevice = () => {
 //处理删除逻辑
 const deleteDeviceInfo = async (item) => {
   await deleteDeviceInfoById(item);
-  deviceInfos.list = await getDeviceInfo(param.value);
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(param.value);
   deviceInfoKey.value++;
   showDeletion.value = false;
 };
@@ -244,15 +261,20 @@ const cancelDeleteDeviceInfo = () => {
   showDeletion.value = false;
 };
 const param = ref();
+const defaultDate = ["2024-05-13", "2024-05-14"];
 onMounted(async () => {
   param.value = route.params.param;
-  historyData.value = await methedMap["用户数据管理"](param.value);
-  deviceCount.value = await getDeviceCount();
+  historyData.value.list = await methedMap["用户数据管理"](param.value);
+  console.log(historyData.value.list);
+  console.log(typeof historyData.value.list);
+  deviceCount.value = await getDeviceCount(param.value);
   mapResultToShow(devices, deviceCount);
-  deviceInfos.list = await getDeviceInfo(param.value);
-  //获取用户数据
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
+    param.value,
+    defaultDate[0],
+    defaultDate[1],
+  );
   users.value = await getUsers();
-  // console.log(users.value);
 });
 const isUserAdmin = ref(true);
 //用户逻辑操作
@@ -279,6 +301,28 @@ const updateUser = async (user) => {
   if (store.getters.user.username === u.username) {
     store.commit("addUser", u);
   }
+};
+
+const changeDate = async (date) => {};
+
+const disabledDate = (current) => {
+  // Can not select days before today and today
+  return current && current > dayjs().endOf("day");
+};
+
+const date = ref();
+const dateChange = async (value) => {
+  const changeDate = [];
+  value.forEach((item) => {
+    changeDate.push(moment(item.toLocaleString()).format("YYYY-MM-DD"));
+  });
+  console.log(changeDate);
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
+    param.value,
+    changeDate[0],
+    changeDate[1],
+  );
+  deviceInfoKey.value++;
 };
 </script>
 <style scoped lang="less">
@@ -308,15 +352,10 @@ const updateUser = async (user) => {
       //border:1px solid red;
     }
     .main {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       .device_main {
-        width: 100%;
         padding: 0 50px;
         display: flex;
-
+        //flex-direction: column;
         .device_info {
           flex: 1;
         }

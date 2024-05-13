@@ -1,6 +1,10 @@
 import request from "@/apis/request.js";
 
 const getCityWaterConsume = async (city) => {
-  return request.get(`/citywaterconsume/${city}`);
+  return request.get(`/citywaterconsume/infos/${city}`);
 };
-export { getCityWaterConsume };
+const getCityWaterAvgConsume = async (city) => {
+  return request.get(`/citywaterconsume/avg/${city}`);
+};
+
+export { getCityWaterConsume, getCityWaterAvgConsume };

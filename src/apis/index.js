@@ -1,12 +1,25 @@
-import { getCityWaterConsume } from "./CityWaterConsume";
-import { getCityEnergyConsumption } from "./CityWaterEnergyConsumption";
-import { getCityWaterTemperature } from "./CityWaterTemperature";
-import { getCityWaterPressure } from "./CityWaterPressure";
+import {
+  getCityWaterConsume,
+  getCityWaterAvgConsume,
+} from "./CityWaterConsume";
+import {
+  getCityEnergyConsumption,
+  getCityAvgEnergyConsumption,
+} from "./CityWaterEnergyConsumption";
+import {
+  getCityWaterTemperature,
+  getCityWaterAvgTemperature,
+} from "./CityWaterTemperature";
+import {
+  getCityWaterPressure,
+  getCityWaterAvgPressure,
+} from "./CityWaterPressure";
 import { getDeviceCount } from "@/apis/deviceCount.js";
 import {
   getDeviceInfo,
   updateDeviceInfo,
   deleteDeviceInfoById,
+  getDeviceInfoByCityAndByDate,
 } from "./deviceInfo.js";
 import {
   getUsers,
@@ -30,4 +43,9 @@ export {
   getHomeData,
   updateUserById,
   getUserByUsername,
+  getDeviceInfoByCityAndByDate,
+  getCityWaterAvgTemperature,
+  getCityWaterAvgPressure,
+  getCityAvgEnergyConsumption,
+  getCityWaterAvgConsume,
 };

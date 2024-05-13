@@ -10,4 +10,13 @@ const updateDeviceInfo = async (device) => {
 const deleteDeviceInfoById = async (id) => {
   return request.delete(`/citydevice/deleteDeviceInfo/${id}`);
 };
-export { getDeviceInfo, updateDeviceInfo, deleteDeviceInfoById };
+
+const getDeviceInfoByCityAndByDate = async (city, startDate, endDate) => {
+  return request.get(`/citydevice/${city}/${startDate}/${endDate}`);
+};
+export {
+  getDeviceInfo,
+  updateDeviceInfo,
+  deleteDeviceInfoById,
+  getDeviceInfoByCityAndByDate,
+};
