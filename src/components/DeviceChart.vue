@@ -14,14 +14,14 @@ const props = defineProps({
 });
 console.log(typeof props.deviceData.list);
 const { title, list } = props.deviceData;
-
+console.log(list);
 const series = [];
 const hotData = [];
 const coldData = [];
-// for (let key in list) {
-//   hotData.push(list[key]["avgHotWater"]);
-//   coldData.push(list[key]["avgColdWater"]);
-// }
+for (let item of list) {
+  hotData.push(item["avgHotWaterConsume"]);
+  coldData.push(item["avgColdConsume"]);
+}
 // console.log(list);
 series.push({
   name: "热水量",
