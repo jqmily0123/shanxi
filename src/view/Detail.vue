@@ -208,6 +208,7 @@ const deleteUser = async (user) => {
   await deleteUserById(user.id);
   users.value = await getUsers();
   message.warn("删除用户成功");
+  comKey.value++;
 };
 const user = ref({});
 const showUpdateUser = ref(false);
