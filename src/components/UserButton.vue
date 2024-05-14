@@ -27,7 +27,7 @@ const logout = () => {
   store.commit("removeUser");
   router.push("/");
 };
-console.log(store.getters.user);
+// console.log(store.getters.user);
 </script>
 <style lang="less" scoped>
 .user {

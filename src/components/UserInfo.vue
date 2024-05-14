@@ -1,5 +1,5 @@
 <template>
-  <div class="user-info" v-if="showUpdateUser">
+  <div class="user-info" v-if="showUpdateBox">
     <canvas ref="canvas" width="50" height="50" class="canvas"></canvas>
     <h1>修改用户信息</h1>
     <a-form class="form">
@@ -31,7 +31,7 @@
 import { onMounted, reactive, ref, watchEffect, defineEmits } from "vue";
 
 const props = defineProps({
-  showUpdateUser: { type: Boolean, default: false },
+  showUpdateBox: { type: Boolean, default: true },
   userInfo: Object,
 });
 const emit = defineEmits(["onUpdateUser"]);

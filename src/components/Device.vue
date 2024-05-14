@@ -11,6 +11,7 @@ const props = defineProps({
   device: Object,
 });
 const { bgIndex, name, count } = props.device;
+
 const bgStyle = computed(() => ({
   background: `url(/src/assets/device/device${bgIndex}.svg) no-repeat`,
 }));

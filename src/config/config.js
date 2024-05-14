@@ -1,8 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 
+let data = [];
+const changeData = {
+  id: "",
+  deviceName: "",
+  deviceStatus: "",
+  deviceMaintenanceStatus: "",
+};
 const getDeviceUpdate = (updateData) => {
-  // console.log(updateData);
-  return [
+  data = [
     {
       id: uuidv4(),
       name: "deviceId",
@@ -13,6 +19,7 @@ const getDeviceUpdate = (updateData) => {
           id: uuidv4(),
           component: "a-input",
           data: updateData.value.id,
+          "onUpdate:modelValue": (newValue) => (updateData.value.id = newValue),
           props: {
             disabled: "disabled",
           },
@@ -29,6 +36,8 @@ const getDeviceUpdate = (updateData) => {
           id: uuidv4(),
           component: "a-input",
           data: updateData.value.deviceName,
+          "onUpdate:modelValue": (newValue) =>
+            (updateData.value.deviceName = newValue),
           props: {},
         },
       ],
@@ -43,6 +52,8 @@ const getDeviceUpdate = (updateData) => {
           id: uuidv4(),
           component: "a-select",
           data: updateData.value.deviceStatus,
+          "onUpdate:modelValue": (newValue) =>
+            (updateData.value.deviceStatus = newValue),
           props: {
             options: [
               { label: "设备正常", value: "设备正常" },
@@ -62,6 +73,8 @@ const getDeviceUpdate = (updateData) => {
           id: uuidv4(),
           component: "a-select",
           data: updateData.value.deviceMaintenanceStatus,
+          "onUpdate:modelValue": (newValue) =>
+            (updateData.value.deviceMaintenanceStatus = newValue),
           props: {
             options: [
               { label: "设备未检修", value: "设备未检修" },
@@ -73,6 +86,15 @@ const getDeviceUpdate = (updateData) => {
       ],
     },
   ];
+  return data;
 };
 
-export { getDeviceUpdate };
+const getData = () => {
+  let i = 0;
+  for (let key in changeData) {
+    changeData[key] = data[i].children[0].data;
+    i++;
+  }
+  return changeData;
+};
+export { getDeviceUpdate, getData };

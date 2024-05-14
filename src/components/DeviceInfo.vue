@@ -6,7 +6,6 @@
         <li class="option">操作</li>
       </ul>
     </div>
-
     <vue3SeamlessScroll :list="list" class="lists" v-bind="classOption">
       <div v-for="item in list" class="list">
         <div>{{ item.id.slice(0, 8) }}</div>
@@ -24,15 +23,13 @@
 </template>
 <script setup>
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
-import moment from "moment";
 import { defineEmits, ref, watchEffect } from "vue";
 const emit = defineEmits(["handleUpdate", "handleDelete"]);
 const props = defineProps({
   deviceInfos: Object,
 });
-console.log(props.deviceInfos);
 const classOption = {
-  step: 0.1, // 滚动速度
+  step: 0.3, // 滚动速度
   hover: true, // 鼠标悬停是否停止滚动
   wheel: true, // 启用鼠标滚轮滚动
 };
@@ -46,12 +43,13 @@ const deleteDevice = (item) => {
 </script>
 <style lang="less" scoped>
 .container {
-  width: 650px;
+  width: 850px;
   display: flex;
-  height: 500px;
+  height: 560px;
   flex-direction: column;
-  background-color: white;
+  //background-color: white;
   .th_c {
+    width: 100%;
     .th {
       display: flex;
       padding: 10px 0;
@@ -67,7 +65,7 @@ const deleteDevice = (item) => {
     }
   }
   .lists {
-    //border:1px solid red;
+    width: 100%;
     overflow-y: hidden;
     overflow-x: visible;
     .list {

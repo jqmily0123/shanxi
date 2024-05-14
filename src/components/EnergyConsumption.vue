@@ -32,9 +32,7 @@ import ProcessBar from "@/components/ProcessBar.vue";
 const { item } = defineProps({
   item: Object,
 });
-console.log(item);
 const { childData } = item;
-// console.log(childData);
 </script>
 <style scoped lang="less">
 .energy-power {

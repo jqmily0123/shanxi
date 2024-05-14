@@ -24,7 +24,7 @@ import {
 import {
   getUsers,
   deleteUserById,
-  updateUserById,
+  updateUser,
   getUserByUsername,
 } from "@/apis/user.js";
 import { getHomeData } from "@/apis/home.js";
@@ -41,7 +41,7 @@ export {
   getUsers,
   deleteUserById,
   getHomeData,
-  updateUserById,
+  updateUser,
   getUserByUsername,
   getDeviceInfoByCityAndByDate,
   getCityWaterAvgTemperature,

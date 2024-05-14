@@ -26,7 +26,7 @@
 </template>
 <script setup>
 import { defineEmits, onMounted, ref, watchEffect } from "vue";
-import { getDeviceUpdate } from "@/config/config.js";
+import { getData, getDeviceUpdate } from "@/config/config.js";
 
 const emit = defineEmits(["onUpdateDevice", "onCancelUpdateDevice"]);
 
@@ -35,13 +35,13 @@ const props = defineProps({
 });
 
 const onUpdate = () => {
-  emit("onUpdateDevice", [changeData, props.updateData]);
+  emit("onUpdateDevice", [getData(), props.updateData]);
 };
 
 const onCancel = () => {
   emit("onCancelUpdateDevice", [changeData, props.updateData]);
 };
-// const { id, deviceName, deviceStatus, deviceMaintenanceStatus } = props;
+
 const changeData = ref({
   id: "",
   deviceName: "",
@@ -60,12 +60,15 @@ onMounted(() => {
 watchEffect(() => {
   data.value = getDeviceUpdate(changeData);
 });
+const updateModelValue = (item, value) => {
+  console.log(item, value);
+};
 </script>
 <style lang="less" scoped>
 .container {
   background-color: #32ed93;
-  width: 400px;
-  height: 300px;
+  width: 430px;
+  height: 350px;
   padding: 15px 20px;
   border-radius: 10px;
   position: absolute;
@@ -80,6 +83,7 @@ watchEffect(() => {
     margin-bottom: 10px;
   }
   ::v-deep(.ant-form-item) {
+    width: 350px;
     .ant-form-item-label {
       width: 100px;
       label {

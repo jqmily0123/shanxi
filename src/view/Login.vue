@@ -52,6 +52,7 @@
         </a-form-item>
       </a-form>
     </div>
+    <typis></typis>
   </div>
 </template>
 <script setup>
@@ -65,6 +66,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const store = useStore();
+import Typis from "@/components/Typis.vue";
 const formState = reactive({
   username: "",
   password: "",

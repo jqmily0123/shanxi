@@ -5,87 +5,44 @@
         <left-sider :leftData="leftData" :left-click="leftChange"></left-sider>
       </a-layout-sider>
       <a-layout-content :style="contentStyle" class="content">
-        <ul class="devices" v-if="deviceCount">
-          <li class="device" v-for="device in devices">
-            <device :device="device"></device>
-          </li>
-        </ul>
-        <div class="main">
-          <div v-if="isUserAdmin">
-            <UserAdmin
-              :users="users"
-              v-if="users"
-              @onDeleteUser="deleteUser"
-              @onUpdateUser="openUpdateUserBox"
-            ></UserAdmin>
-          </div>
-          <div class="device_main" v-else>
-            <device-chart
-              v-if="historyData.list"
-              :deviceData="historyData"
-              :key="deviceKey"
-            ></device-chart>
-            <div class="right">
-              <a-range-picker v-model:value="date" @change="dateChange" />
-              <device-info
-                class="device_info"
-                :deviceInfos="deviceInfos"
-                @handleUpdate="changeShowUpdate"
-                @handleDelete="showDelete"
-                @onChangeDate="changeDate"
-                :key="deviceInfoKey"
-              ></device-info>
-            </div>
-          </div>
+        <div class="main" v-if="showCom">
+          <component
+            :is="mainCom[curComIndex].component"
+            v-bind="mainCom[curComIndex].props"
+            @updateDevice="updateDevice"
+            @deleteDevice="deleteDevice"
+            @dateChange="changeDate"
+            @onDeleteUser="deleteUser"
+            @onUpdateUser="openUpdateUserBox"
+            :key="comKey"
+          ></component>
         </div>
       </a-layout-content>
+      <UserInfo
+        :showUpdateBox="showUpdateUser"
+        :userInfo="user"
+        @onUpdateUser="updateUsers"
+      ></UserInfo>
     </a-layout>
-    <update-box
-      v-if="updateData.showUpdate"
-      @onCancelUpdateDevice="cancelUpdateDevice"
-      @onUpdateDevice="updateDevice"
-      :updateData="updateData"
-      :key="updateKey"
-    ></update-box>
-    <confirm-deletion
-      :showDeletion="showDeletion"
-      :deleteId="deleteId"
-      @onDelete="deleteDeviceInfo"
-      @onCancelDelete="cancelDeleteDeviceInfo"
-    ></confirm-deletion>
-    <user-info
-      :showUpdateUser="showUpdateUser"
-      @onUpdateUser="updateUser"
-      :userInfo="user"
-    ></user-info>
   </div>
 </template>
 <script setup>
 import { useRoute, useRouter } from "vue-router";
-import DeviceInfo from "@/components/DeviceInfo.vue";
-import UpdateBox from "@/components/UpdateBox.vue";
-import ConfirmDeletion from "@/components/ConfirmDeletion.vue";
-import UserInfo from "@/components/UserInfo.vue";
 import { v4 as uuidv4 } from "uuid";
 import LeftSider from "@/components/LeftSider.vue";
-import Device from "@/components/Device.vue";
-import DeviceChart from "@/components/DeviceChart.vue";
-import UserAdmin from "@/components/UserAdmin.vue";
-import { onMounted, reactive, ref, watchEffect } from "vue";
+import InfoAdmin from "@/view/InfoAdmin.vue";
+import UserAdmin from "@/view/UserAdmin.vue";
+import { onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import { message } from "ant-design-vue";
+import UserInfo from "@/components/UserInfo.vue";
 import {
-  getCityWaterPressure,
-  getCityEnergyConsumption,
-  getCityWaterTemperature,
-  getCityWaterConsume,
   getDeviceCount,
-  getDeviceInfo,
   updateDeviceInfo,
   deleteDeviceInfoById,
   getUsers,
   deleteUserById,
-  updateUserById,
+  updateUser,
   getUserByUsername,
   getDeviceInfoByCityAndByDate,
   getCityWaterAvgTemperature,
@@ -95,7 +52,7 @@ import {
 } from "@/apis/index.js";
 import { useStore } from "vuex";
 import moment from "moment/moment.js";
-
+import DevicePage from "@/view/DevicePage.vue";
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
@@ -113,6 +70,10 @@ const leftData = [
   {
     id: uuidv4(),
     name: "用户数据管理",
+  },
+  {
+    id: uuidv4(),
+    name: "设备信息管理",
   },
   {
     id: uuidv4(),
@@ -135,28 +96,6 @@ const leftData = [
     name: "返回首页",
   },
 ];
-const devices = reactive([
-  {
-    bgIndex: 1,
-    name: "设备总数",
-  },
-  {
-    bgIndex: 2,
-    name: "离线设备数",
-  },
-  {
-    bgIndex: 3,
-    name: "运行设备数",
-  },
-  {
-    bgIndex: 4,
-    name: "故障设备数",
-  },
-  {
-    bgIndex: 5,
-    name: "预警设备数",
-  },
-]);
 
 const deviceInfos = ref({});
 deviceInfos.value.th = [
@@ -166,23 +105,6 @@ deviceInfos.value.th = [
   "设备检修状态",
   "时间",
 ];
-
-const updateKey = ref(0);
-const updateData = ref({
-  showUpdate: false,
-  id: "",
-  deviceName: "",
-  deviceStatus: "",
-  deviceMaintenanceStatus: "",
-});
-const changeShowUpdate = (item) => {
-  updateData.value.id = item.id;
-  updateData.value.deviceName = item.deviceName;
-  updateData.value.deviceStatus = item.deviceStatus;
-  updateData.value.deviceMaintenanceStatus = item.deviceMaintenanceStatus;
-  updateData.value.showUpdate = !updateData.value.showUpdate;
-  updateKey.value++;
-};
 
 const showDeletion = ref(false);
 const deleteId = ref();
@@ -199,39 +121,10 @@ const methedMap = {
   设备能耗信息管理: getCityAvgEnergyConsumption,
 };
 
-const historyData = ref({});
-const deviceKey = ref(0);
-const leftChange = async (item) => {
-  if (item.name === "返回首页") {
-    await router.push("/home");
-    return;
-  }
-  if (item.name !== "用户数据管理") {
-    isUserAdmin.value = false;
-    const param = route.params.param;
-    historyData.value.title = item.name;
-    historyData.value.list = await methedMap[item.name](param);
-    deviceKey.value++;
-  } else {
-    isUserAdmin.value = true;
-  }
-};
 const deviceCount = ref();
-
-const mapResultToShow = (devices, deviceCount) => {
-  console.log(devices);
-  devices[0].count = deviceCount.value.totalDevicesCount;
-  devices[1].count = deviceCount.value.offlineDevicesCount;
-  devices[2].count = deviceCount.value.onlineDevicesCount;
-  devices[3].count = deviceCount.value.defaultDevicesCount;
-  devices[4].count = deviceCount.value.warningDevicesCount;
-};
-
-//处理更新逻辑
-const deviceInfoKey = ref(0);
+const comKey = ref(0);
 const updateDevice = async (data) => {
   const [changeData, preData] = data;
-  console.log(changeData, preData);
   if (
     changeData.deviceName === preData.deviceName &&
     changeData.deviceStatus === preData.deviceStatus &&
@@ -240,43 +133,75 @@ const updateDevice = async (data) => {
     message.warn("您没有改变任何设备信息哦");
     return;
   }
+  console.log(changeData);
   await updateDeviceInfo(changeData);
   message.success("设备信息修改成功");
-  deviceInfos.list = await getDeviceInfo(param.value);
-  deviceInfoKey.value++;
-  updateData.value.showUpdate = !updateData.value.showUpdate;
-};
-const cancelUpdateDevice = () => {
-  updateData.value.showUpdate = !updateData.value.showUpdate;
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
+    param.value,
+    CDate.value[0],
+    CDate.value[1],
+  );
+  comKey.value++;
 };
 
 //处理删除逻辑
-const deleteDeviceInfo = async (item) => {
-  await deleteDeviceInfoById(item);
-  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(param.value);
-  deviceInfoKey.value++;
-  showDeletion.value = false;
-};
-const cancelDeleteDeviceInfo = () => {
-  showDeletion.value = false;
+const deleteDevice = async (item) => {
+  console.log(CDate.value, param.value);
+  await deleteDeviceInfoById(item.id);
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
+    param.value,
+    CDate.value[0],
+    CDate.value[1],
+  );
+  comKey.value++;
 };
 const param = ref();
 const defaultDate = ["2024-05-13", "2024-05-14"];
+const mainCom = ref();
+const showCom = ref(false);
 onMounted(async () => {
+  //获取用户信息
+  users.value = await getUsers();
   param.value = route.params.param;
+  //初始化CDate
+  CDate.value = defaultDate;
   historyData.value.list = await methedMap["用户数据管理"](param.value);
-  console.log(historyData.value.list);
-  console.log(typeof historyData.value.list);
   deviceCount.value = await getDeviceCount(param.value);
-  mapResultToShow(devices, deviceCount);
   deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
     param.value,
     defaultDate[0],
     defaultDate[1],
   );
-  users.value = await getUsers();
+  mainCom.value = [
+    {
+      id: uuidv4(),
+      name: "用户信息管理",
+      component: UserAdmin,
+      props: {
+        users: users.value,
+      },
+    },
+    {
+      id: uuidv4(),
+      name: "设备信息管理",
+      component: DevicePage,
+      props: {
+        devices: deviceCount.value,
+        deviceInfos: deviceInfos.value,
+      },
+    },
+    {
+      id: uuidv4(),
+      name: "设备消耗管理",
+      component: InfoAdmin,
+      props: {
+        waterInfoData: historyData.value,
+      },
+    },
+  ];
+  showCom.value = true;
 });
-const isUserAdmin = ref(true);
+
 //用户逻辑操作
 const users = ref();
 const deleteUser = async (user) => {
@@ -292,8 +217,8 @@ const openUpdateUserBox = async (u) => {
   user.value.username = u.username;
   user.value.avatar = u.avatar;
 };
-const updateUser = async (user) => {
-  await updateUserById(user);
+const updateUsers = async (user) => {
+  await updateUser(user);
   message.success("用户信息修改成功");
   showUpdateUser.value = false;
   const u = await getUserByUsername(user.username);
@@ -302,27 +227,40 @@ const updateUser = async (user) => {
     store.commit("addUser", u);
   }
 };
-
-const changeDate = async (date) => {};
-
+const CDate = ref([]);
+const changeDate = async (date) => {
+  CDate.value = [];
+  date.forEach((item) => {
+    CDate.value.push(moment(item.toLocaleString()).format("YYYY-MM-DD"));
+  });
+  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
+    param.value,
+    CDate.value[0],
+    CDate.value[1],
+  );
+  comKey.value++;
+};
 const disabledDate = (current) => {
-  // Can not select days before today and today
   return current && current > dayjs().endOf("day");
 };
 
-const date = ref();
-const dateChange = async (value) => {
-  const changeDate = [];
-  value.forEach((item) => {
-    changeDate.push(moment(item.toLocaleString()).format("YYYY-MM-DD"));
-  });
-  console.log(changeDate);
-  deviceInfos.value.list = await getDeviceInfoByCityAndByDate(
-    param.value,
-    changeDate[0],
-    changeDate[1],
-  );
-  deviceInfoKey.value++;
+const curComIndex = ref(0);
+const historyData = ref({});
+
+const leftChange = async (item) => {
+  if (item.name === "返回首页") {
+    await router.push("/home");
+  } else if (item.name === "设备信息管理") {
+    curComIndex.value = 1;
+  } else if (item.name === "用户数据管理") {
+    curComIndex.value = 0;
+  } else {
+    curComIndex.value = 2;
+    const param = route.params.param;
+    historyData.value.title = item.name;
+    historyData.value.list = await methedMap[item.name](param);
+    comKey.value++;
+  }
 };
 </script>
 <style scoped lang="less">
@@ -341,7 +279,6 @@ const dateChange = async (value) => {
     display: flex;
     flex-direction: column;
     align-items: center;
-
     .devices {
       width: 100%;
       display: flex;
@@ -352,6 +289,7 @@ const dateChange = async (value) => {
       //border:1px solid red;
     }
     .main {
+      margin-top: 80px;
       .device_main {
         padding: 0 50px;
         display: flex;

@@ -21,6 +21,7 @@
     "pinyin-pro": "^3.20.0",
     "prettier": "^3.2.5",
     "segmentit": "^2.0.3",
+    "typeit": "^8.8.3",
     "uuid": "^9.0.1",
     "vue": "^3.4.21",
     "vue-cropper": "^1.1.2",
