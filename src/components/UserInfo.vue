@@ -12,7 +12,7 @@
       <a-form-item label="用户密码">
         <a-input v-model:value="userInfo.password"></a-input>
       </a-form-item>
-      <a-form-item label="修改头像">
+      <a-form-item label="修改头像" class="change_av">
         <a-upload
           v-model:file-list="fileList"
           name="file"
@@ -113,6 +113,12 @@ const handleClick = () => {
   }
   .form {
     margin-top: 30px;
+    .change_av {
+      display: flex;
+      align-items: center;
+      border: 1px solid red;
+      padding: 10px 0;
+    }
   }
   h1 {
     color: #fff;
